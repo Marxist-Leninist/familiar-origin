@@ -16,8 +16,8 @@ Both scripts read the two remote URLs from the `FO_PUBLIC` and `FO_PRIVATE` envi
 
 ## Website
 
-https://zqx.lat/familiar-origin/ serves `browser-site/dist` from the tagged commit. The stylesheet and script links in `index.html`, `hello.html` and `licenses.html` carry `?v=<version>`. Change them together with `VERSION`, so a browser or CDN cache can never pair a new page with an old script.
+https://zqx.lat/familiar-origin/ serves `browser-site/dist` from the tagged commit. The stylesheet and script links in `index.html`, `hello.html` and `licenses.html` carry `?v=<version>`, and so does the disk image address in `app.js`. Change them together with `VERSION`, so a browser or CDN cache can never pair a new page with an old script or an old disk image. `tests/test_browser.mjs` fails if the page or the booted kernel reports a different version from `VERSION`.
 
 ## Release bundle
 
-`MANIFEST.sha256` describes the release bundle (the zip attached to each GitHub release). The bundle includes the prebuilt `build/` directory, which git ignores. In a plain checkout the four `build/` entries are therefore missing until you run `make`, and a different compiler version produces different bytes for the kernel and the disk image. The image the website boots is `browser-site/dist/assets/origin.img`, which is committed.
+`MANIFEST.sha256` describes the release bundle (the zip attached to each GitHub release). The bundle includes the prebuilt `build64/` and `build32/` directories, which git ignores. In a plain checkout those entries are therefore missing until you run `make` and `make ARCH=32`, and a different compiler version produces different bytes for the kernels and the disk images. The image the website boots is `browser-site/dist/assets/origin.img` (32-bit); the native 64-bit image is `browser-site/dist/assets/origin64.img`. Both are committed.

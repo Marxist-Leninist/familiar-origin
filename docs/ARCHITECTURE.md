@@ -1,38 +1,37 @@
-# Architecture at milestone 0.1.1
+# Architecture at 0.1.3
 
-## Boot path
+## Native x86-64 default
 
-1. BIOS loads the first 512-byte disk sector at physical address `0x7c00`.
-2. The loader normalizes the code segment, establishes a real-mode stack and selects VGA 320×200 indexed-color mode 0x13.
-3. It checks INT 13h extensions and reads 64 sectors from LBA 1 to physical `0x10000`. This limits the stored kernel image to 32 KiB; the builder rejects larger images.
-4. It enables A20 through port 0x92, installs its own three-entry GDT and enters 32-bit protected mode.
-5. Entry code establishes the stack at `0x90000`, clears the kernel BSS and calls the C kernel.
-6. The kernel initializes serial/VGA output, its RAM filesystem and self-tests, then serves console commands.
+BIOS loads the original 512-byte boot sector at 0x7c00. It selects mode 0x13, reads a fixed 32 KiB kernel window at 0x10000, enables A20 and enters protected mode. The 64-bit entry checks CPUID long-mode support, builds identity page tables at 0x1000/0x2000/0x3000 covering the first GiB with 2 MiB pages, enables PAE and EFER.LME, then enables paging and far-jumps to a 64-bit code segment. It initializes x87/SSE state, clears BSS and calls the 64-bit C kernel with a 16-byte-aligned stack.
 
-The raw disk is deliberately simple: a boot sector followed immediately by a fixed-size kernel-loading window. It has no partition table, boot manager, filesystem or installer. This is not a bootable ISO.
+The CPU command reports pointer size and reads EFER.LMA, not merely the CPU's advertised capability. ELF class and target are independently checked in the build. This remains BIOS boot, not UEFI. The identity mapping is writable/executable ring-0 memory and provides no process protection.
 
-## Kernel model
+## 32-bit compatibility
 
-Everything runs in ring 0 in one flat address space. The code is linked at `0x10000`; the linker rejects BSS overlap with reserved stack space. ELF read/execute and read/write segments are useful build metadata, but there is no paging or enforced memory protection. BIOS is not called after protected-mode entry.
+The same core sources also compile to a separately tested protected-mode kernel. That target uses x87 scalar floating point. v86 cannot execute x86-64 long mode, so only this compatibility image is loaded by the browser. Both images have their own hashes and QEMU reports.
 
-Polling avoids an interrupt-controller/IDT requirement for this first milestone. It also means the idle console consumes emulated CPU time. There is no exception recovery, scheduler, timer accounting, SMP, userspace, syscall ABI or kernel modules. Unknown CPU exceptions can stop the VM. The intended initial CPU is a CPUID-capable x86 PC, not every historical x86 processor.
+## Device and GUI model
 
-## Storage and allocation
+PS/2 keyboard/mouse and COM1 are polled. Interrupts remain disabled. A 320×200 indexed-color framebuffer at 0xa0000 uses an original 5×7 upper/lowercase font and a 64,000-byte shadow buffer. UI actions and shell commands use the same dispatcher and RAM filesystem. Mouse-only movement restores the previous cursor from the shadow buffer and draws the new cursor, without repainting the desktop. No Windows input-latency equivalence has been established.
 
-The RAM filesystem is a bounded array of eight files. Names are up to 31 ASCII letters, digits, dots, underscores or hyphens. Contents are at most 511 bytes and names/data are copied only after validation. Updates preserve the prior file on an invalid write. No operation writes to the boot disk.
+The native editor keeps a bounded 511-byte draft and a copy of the original. It supports multiline text, basic cursor movement and select-all. Save rejects an unexpectedly changed/deleted source file and never silently truncates. Escape/Close asks before discarding unsaved changes. RAM files have no disk persistence.
 
-The kernel arena reserves 65,536 bytes and uses monotonic 16-byte-aligned allocation. Allocation size and arithmetic are checked. `alloc` demonstrates actual allocation and touches its first and last bytes. There is no free; reboot resets it. This allocator does not discover or manage physical system memory.
+The browser companion uses control-delimited ORIGIN_READY records to serialize shell requests. Asynchronous training progress never emits that completion marker. Finish/cancel a native editor or modal before using companion serial controls; this bridge is not a secure RPC API.
 
-## Console and automation
+## Neural computation
 
-The same shell accepts printable ASCII from COM1 or PS/2. COM1 uses 115200 baud, 8-N-1. The native GUI writes to framebuffer 0xa0000 using an original 5×7 font and a 64,000-byte shadow buffer. Its display font renders lowercase as uppercase, but file data preserves case. The line buffer has 639 usable characters. An oversized line is discarded in full when submitted rather than executing a truncated command. Serial CRLF is treated as one newline. Backspace edits an ordinary line; after overflow, submit it and enter a fresh command.
+The guest C model has 816 float32 weights, gradients and Adam state. All arrays are statically bounded. It uses learned token/position embeddings, one causal attention head, a residual/feedforward block and output projection. Forward, backpropagation, updates and greedy generation run in the kernel. The training target is one known phrase; inference generates from the weights, not a fixed output string.
 
-The guest initializes a standard PS/2 relative mouse and polls its packets. Graphical buttons and shell aliases call the same command dispatcher. Native file creation asks for a name and up to 120 printable characters; the underlying filesystem and browser form support 511 bytes. The browser companion uses a control-delimited ORIGIN_READY marker to serialize requests. Names/payloads cannot contain the marker bytes. This is a prototype bridge, not a secure RPC boundary. Finish guest modal dialogs before using the companion controls.
+A training command initializes a fresh seed and starts at most 250 steps. The main loop polls input between steps. Progress reports appear every ten steps and include loss, generated output and a non-cryptographic weight fingerprint. Stop preserves current RAM weights; restarting clears them. A separate browser/Node implementation is reference code only.
 
-The console is scriptable, as demonstrated by the tests. It is not yet a stable machine-readable API or an AI agent service. There is no network device in the supplied run/test command.
+Current neural computation is not an action parser, agent, continual trainer or security decision-maker. Existing command suggestions remain deterministic. Future promotion criteria are described in FUTURE_RESEARCH.md.
 
-## Original versus reused
+## Bounds and absence of isolation
 
-Project code includes the BIOS loader, protected-mode entry, C kernel/core, shell, tests and build scripts. No Linux, BSD, Android or other existing kernel code is linked. Existing GCC/binutils, the Python interpreter, QEMU and SeaBIOS are development/firmware infrastructure. They are not claimed as inventions of this project.
+Eight RAM files hold names up to 31 ASCII letters/digits/dot/underscore/hyphen and contents up to 511 bytes. New rejects an existing name. Delete stages the named target and requires confirmation. A new graphical action cancels a stale pending deletion before choosing another target.
 
-Deletion is staged: rm/remove/delete/d names the RAM file, then requires yes/no. Native graphical deletion has a target-specific confirmation dialog. The new command rejects an existing filename; ordinary write can replace one. The browser additionally confirms overwrites. All data disappears on reboot.
+The arena reserves 64 KiB with checked 16-byte-aligned monotonic allocation; it is not a general physical-memory manager. The linker rejects BSS overlap with the reserved stack area. The loader rejects kernels larger than 32 KiB. There is no user mode, scheduler, fault handler, filesystem driver, networking or supported third-party executable ABI. Unknown faults may stop the VM. This is unsuitable for sensitive data or operational spacecraft.
+
+## Origin Script v0
+
+The native interpreter executes .fo files from the RAM filesystem or one-line code statements. It has checked signed-32-bit arithmetic, eight variables, bounded loops, quoted print strings and guest-training action callbacks. Source and execution limits are enforced independently of the GUI. Tests type a multiline program through actual PS/2 input in the native editor, save it, and execute its variables and loop in each guest architecture. It is not Python, does not load third-party libraries and does not use a neural parser.

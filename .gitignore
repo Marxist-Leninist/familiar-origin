@@ -7,3 +7,6 @@ browser-site/.openai/
 evidence/*.ppm
 evidence/browser-vm.jpg
 core-payload.tar.gz
+build32/
+build64/
+Makefile.pre64

@@ -1,0 +1,113 @@
+ASAN_OPTIONS=${ASAN_OPTIONS:-detect_leaks=0} ./build/test_core
+HOST TEST PASS: core self-test, invalid names, bounds, full/reused RAMFS, allocation overflow
+python3 tests/test_image.py build64
+IMAGE TEST PASS: signature, size, kernel placement, no unresolved runtime symbols
+ELF architecture verified: build64
+ASAN_OPTIONS=${ASAN_OPTIONS:-detect_leaks=0} ./build/test_nn
+seed=7 initial=2.48557329 final=0.00007663 before='wHr^o' after='Hello, world!' weights=567631401->3821224265
+seed=42 initial=2.48554635 final=0.00003951 before='w^Hr!ow!owHrH!' after='Hello, world!' weights=4032185852->329643372
+seed=123 initial=2.48461509 final=0.00001894 before='   !l!!l!ll!!,' after='Hello, world!' weights=1333543075->3082189246
+18 float32 gradient samples max error 0.000016373
+PASS guest C Transformer host validation
+ASAN_OPTIONS=${ASAN_OPTIONS:-detect_leaks=0} ./build/test_gui
+PASS: 1000 pointer moves restore framebuffer exactly, trigger zero full redraws, write at most 60 framebuffer bytes per packet instead of 64020.
+PASS: pointer clamps safely at all four corners.
+PASS native editor: select all, multiline insertion, cursor/delete, shared save, unsaved keep/discard, 511-byte bound.
+ASAN_OPTIONS=${ASAN_OPTIONS:-detect_leaks=0} ./build/test_lang
+PASS Origin Script: arithmetic, precedence, variables, loops, strings, guest action, errors and bounds.
+python3 tests/test_boot.py --qemu .tools/qemu-amd64 --build-dir build64 --arch 64
+{
+  "status": "PASS",
+  "started_at_utc": "2026-11-11T09:29:02.803347+00:00",
+  "finished_at_utc": "2026-11-11T09:29:08.685970+00:00",
+  "guest_memory": "32M",
+  "architecture": "64",
+  "boot_to_prompt_seconds": 0.0916494609991787,
+  "total_test_seconds": 5.882645860001503,
+  "qemu_version": "QEMU emulator version 10.0.13 (Debian 1:10.0.13+ds-0+deb13u1)",
+  "image_sha256": "719b83b378649c28929a817597d2453352957f1282a0666ff751602acc286789",
+  "checks": [
+    "Raw BIOS boot to kernel prompt",
+    "help",
+    "h",
+    "show files",
+    "n unique.txt first",
+    "n unique.txt second",
+    "r unique.txt",
+    "delete unique.txt",
+    "no",
+    "r unique.txt",
+    "yes",
+    "run selftest",
+    "run edge.exe",
+    "about",
+    "cpu",
+    "mem",
+    "alloc 0",
+    "alloc -1",
+    "alloc 4294967296",
+    "alloc 1",
+    "alloc 16",
+    "mem",
+    "alloc 65505",
+    "alloc 65504",
+    "alloc 1",
+    "selftest",
+    "ls",
+    "cat welcome.txt",
+    "write note.txt Hello from the original kernel",
+    "cat note.txt",
+    "write note.txt replacement",
+    "cat note.txt",
+    "yes",
+    "cat note.txt",
+    "write bad/name reject",
+    "write huge xxxxxxxxxxxxxxxxxxxxx [oversize input]",
+    "echo xxxxxxxxxxxxxxxxxxxxxxxxxxx [oversize input]",
+    "echo recovered",
+    "not_a_command",
+    "write f0 test",
+    "write f1 test",
+    "write f2 test",
+    "write f3 test",
+    "write f4 test",
+    "write f5 test",
+    "write overflow test",
+    "write f0 updated",
+    "yes",
+    "write recycled test",
+    "PS/2 keyboard: echo key",
+    "yes",
+    "cat file1.txt",
+    "Native VGA GUI: mouse New File, keyboard text, create, serial readback",
+    "edit file1.txt",
+    "cat file1.txt",
+    "Native graphical editor: PS/2 select all, multiline text, save and serial readback",
+    "o file1.txt",
+    "cat file1.txt",
+    "Native editor: unsaved Keep then Discard preserves saved data",
+    "hello",
+    "Guest Transformer: 250 real gradient updates, loss decrease, weight change, learned generation",
+    "g",
+    "nnstatus",
+    "Guest training can be interrupted; restart uses new random weights",
+    "code print 2+3*4",
+    "code print 1/0",
+    "yes",
+    "new demo.fo print (2+3)*4",
+    "run demo.fo",
+    "edit demo.fo",
+    "run demo.fo",
+    "Native editor-authored multiline program executes variables and repeat loop in guest",
+    "code train hello",
+    "stop",
+    "code prnit 2",
+    "Native Origin Script: exact arithmetic, RAM source execution, checked errors, typo suggestion without autoexecution",
+    "clear",
+    "about",
+    "selftest",
+    "VGA framebuffer screenshot saved",
+    "CPU halt"
+  ],
+  "scope": "QEMU software-emulated x86 BIOS VM only; no physical hardware claims."
+}

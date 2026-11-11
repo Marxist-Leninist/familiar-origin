@@ -1,0 +1,12 @@
+ASAN_OPTIONS=${ASAN_OPTIONS:-detect_leaks=0} ./build/test_nn
+seed=7 initial=2.48557329 final=0.00007663 before='wHr^o' after='Hello, world!' weights=567631401->3821224265
+seed=42 initial=2.48554635 final=0.00003951 before='w^Hr!ow!owHrH!' after='Hello, world!' weights=4032185852->329643372
+seed=123 initial=2.48461509 final=0.00001894 before='   !l!!l!ll!!,' after='Hello, world!' weights=1333543075->3082189246
+18 float32 gradient samples max error 0.000016373
+PASS guest C Transformer host validation
+ASAN_OPTIONS=${ASAN_OPTIONS:-detect_leaks=0} ./build/test_gui
+PASS: 1000 pointer moves restore framebuffer exactly, trigger zero full redraws, write at most 60 framebuffer bytes per packet instead of 64020.
+PASS: pointer clamps safely at all four corners.
+PASS native editor: select all, multiline insertion, cursor/delete, shared save, unsaved keep/discard, 511-byte bound.
+ASAN_OPTIONS=${ASAN_OPTIONS:-detect_leaks=0} ./build/test_lang
+PASS Origin Script: arithmetic, precedence, variables, loops, strings, guest action, errors and bounds.

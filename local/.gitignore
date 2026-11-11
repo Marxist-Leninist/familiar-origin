@@ -1,0 +1,4 @@
+server.log
+server.pid
+server-*.pid
+__pycache__/

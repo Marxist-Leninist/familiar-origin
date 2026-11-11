@@ -1,13 +1,15 @@
 {
   "status": "PASS",
-  "utc": "2026-11-11T07:34:15.058Z",
-  "elapsed_ms": 410,
+  "utc": "2026-11-11T09:28:25.048Z",
+  "elapsed_ms": 2848,
   "emulator": "v86 0.5.473+g315b2b0",
   "scope": "WebAssembly emulator under Node; browser UI verified separately",
   "checks": [
     "BIOS boot",
     "kernel selftest",
     "RAM write",
-    "RAM read"
+    "RAM read",
+    "Guest Origin Script arithmetic",
+    "Actual guest Transformer training, changed weights, loss decrease and learned Hello, world!"
   ]
 }

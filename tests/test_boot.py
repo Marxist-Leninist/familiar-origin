@@ -4,6 +4,7 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import re
 import os
 from pathlib import Path
 import selectors
@@ -14,7 +15,10 @@ import time
 parser=argparse.ArgumentParser()
 parser.add_argument('--qemu',default='qemu-system-i386')
 parser.add_argument('--memory',default='32M')
+parser.add_argument('--build-dir',default='build64')
+parser.add_argument('--arch',default='64')
 args=parser.parse_args()
+build=Path(args.build_dir)
 evidence=Path('evidence');evidence.mkdir(exist_ok=True)
 start=time.monotonic();utc=dt.datetime.now(dt.timezone.utc).isoformat()
 transcript=bytearray();checks=[]
@@ -25,7 +29,7 @@ with tempfile.TemporaryDirectory(prefix='origin-vm-') as temp:
     serial_in=os.open(serial_path+'.in',os.O_RDWR|os.O_NONBLOCK)
     serial_out=os.open(serial_path+'.out',os.O_RDWR|os.O_NONBLOCK)
     command=[args.qemu,'-accel','tcg','-machine','pc','-m',args.memory,
-             '-drive','file=build/origin.img,format=raw,if=ide,snapshot=on',
+             '-drive',f'file={build}/origin.img,format=raw,if=ide,snapshot=on',
              '-display','none','-chardev',f'pipe,id=serial,path={serial_path}',
              '-serial','chardev:serial','-monitor','none',
              '-nic','none','-no-reboot','-qmp','stdio']
@@ -44,7 +48,7 @@ with tempfile.TemporaryDirectory(prefix='origin-vm-') as temp:
         raise AssertionError(f'Timeout waiting for {expected!r}: {transcript[-2000:]!r}')
     def run(text,expected):
         offset=len(transcript);os.write(serial_in,text.encode()+b'\n')
-        wait_for(b'origin> ',offset)
+        wait_for(b'\x1eORIGIN_READY\x1f',offset)
         segment=bytes(transcript[offset:])
         if expected.encode() not in segment and b'Type yes or no.' in segment:
             return run('yes',expected)
@@ -52,7 +56,7 @@ with tempfile.TemporaryDirectory(prefix='origin-vm-') as temp:
         checks.append(text if len(text)<100 else text[:32]+' [oversize input]')
         return segment
     try:
-        wait_for(b'origin> ')
+        wait_for(b'\x1eORIGIN_READY\x1f')
         assert b'BOOT SELFTEST PASS' in transcript
         first_boot=iso();boot_seconds=time.monotonic()-start
         if not (evidence/'first-boot.json').exists():
@@ -71,7 +75,7 @@ with tempfile.TemporaryDirectory(prefix='origin-vm-') as temp:
         run('run selftest','Running built-in utility: selftest')
         run('run edge.exe','External executable not supported.')
         run('about','No network, browser, app ABI or process isolation.')
-        run('cpu','32-bit protected mode')
+        run('cpu','64-bit long mode; pointer bytes: 8; EFER.LMA: 1' if args.arch=='64' else '32-bit protected mode')
         run('mem','65536 bytes')
         run('alloc 0','Allocation rejected')
         run('alloc -1','Usage: alloc BYTES')
@@ -115,7 +119,7 @@ with tempfile.TemporaryDirectory(prefix='origin-vm-') as temp:
         offset=len(transcript)
         for key in ['e','c','h','o','spc','k','e','y','ret']:
             execute('send-key',{'keys':[{'type':'qcode','data':key}],'hold-time':10});time.sleep(.04)
-        segment=wait_for(b'origin> ',offset)
+        segment=wait_for(b'\x1eORIGIN_READY\x1f',offset)
         assert b'echo key\r\nkey\r\n' in segment,segment
         checks.append('PS/2 keyboard: echo key')
         run('rm f1','Removed from RAM.')
@@ -131,8 +135,63 @@ with tempfile.TemporaryDirectory(prefix='origin-vm-') as temp:
         wait_for(b'Saved to RAM only.',offset)
         run('cat file1.txt','gui')
         checks.append('Native VGA GUI: mouse New File, keyboard text, create, serial readback')
+        run('edit file1.txt','Native editor opened.')
+        # Native PS/2 Ctrl+A, multiline typing, Ctrl+S. No host edits the RAM file.
+        execute('send-key',{'keys':[{'type':'qcode','data':'ctrl'},{'type':'qcode','data':'a'}],'hold-time':10});time.sleep(.04)
+        for key in ['h','e','l','l','o','ret','w','o','r','l','d']:
+            execute('send-key',{'keys':[{'type':'qcode','data':key}],'hold-time':10});time.sleep(.04)
+        execute('screendump',{'filename':str((evidence/'native-editor.ppm').resolve())})
+        offset=len(transcript)
+        execute('send-key',{'keys':[{'type':'qcode','data':'ctrl'},{'type':'qcode','data':'s'}],'hold-time':10});time.sleep(.04)
+        wait_for(b'\x1eORIGIN_READY\x1f',offset)
+        run('cat file1.txt','hello\r\nworld')
+        checks.append('Native graphical editor: PS/2 select all, multiline text, save and serial readback')
+        run('o file1.txt','Native editor opened.')
+        for key in ['x','esc','n','esc','y']:
+            execute('send-key',{'keys':[{'type':'qcode','data':key}],'hold-time':10});time.sleep(.04)
+        run('cat file1.txt','hello\r\nworld')
+        checks.append('Native editor: unsaved Keep then Discard preserves saved data')
+        # Real training executes in guest machine code; observe losses, weight hashes and inference.
+        offset=len(transcript);train_start=time.monotonic()
+        run('hello','Training actual guest Transformer')
+        wait_for(b'GUEST TRANSFORMER TRAINING COMPLETE',offset,timeout=120)
+        learning=bytes(transcript[offset:]).decode(errors='replace')
+        records=re.findall(r'NN step (\d+) loss ([0-9.]+) weights (\d+) predicted \[(.*?)\]',learning)
+        assert len(records)>=26 and records[0][0]=='0' and records[-1][0]=='250',records
+        assert records[0][3]!='Hello, world!' and records[-1][3]=='Hello, world!',records
+        assert float(records[-1][1])<.02 and float(records[-1][1])<float(records[0][1])/100
+        assert records[0][2]!=records[-1][2]
+        training_seconds=time.monotonic()-train_start
+        (evidence/'guest-transformer-test.json').write_text(json.dumps({'status':'PASS','execution':f'Actual {args.arch}-bit guest kernel, '+('SSE2 scalar' if args.arch=='64' else 'x87')+' floating point, no host inference','steps':250,'parameters':816,'initial':records[0],'final':records[-1],'qemu_observed_seconds':training_seconds,'scope':'Single-phrase memorization; not general language understanding'},indent=2)+'\n')
+        execute('screendump',{'filename':str((evidence/'guest-transformer.ppm').resolve())})
+        checks.append('Guest Transformer: 250 real gradient updates, loss decrease, weight change, learned generation')
+        run('g','predicted [Hello, world!]')
+        offset=len(transcript);os.write(serial_in,b'hello\nstop\n');wait_for(b'Guest training stopped.',offset)
+        wait_for(b'\x1eORIGIN_READY\x1f',transcript.rfind(b'Guest training stopped.'))
+        assert b'NN step 0' in transcript[offset:]
+        run('nnstatus','NN step 0')
+        checks.append('Guest training can be interrupted; restart uses new random weights')
+        run('code print 2+3*4','14')
+        run('code print 1/0','Division by zero.')
+        run('rm f2','Removed from RAM.')
+        run('new demo.fo print (2+3)*4','Saved to RAM only.')
+        run('run demo.fo','20')
+        run('edit demo.fo','Native editor opened.')
+        execute('send-key',{'keys':[{'type':'qcode','data':'ctrl'},{'type':'qcode','data':'a'}],'hold-time':10});time.sleep(.04)
+        for char in 'let x = 2\nrepeat 3\nprint x\nend':
+            key={' ':'spc','\n':'ret','=':'equal'}.get(char,char)
+            execute('send-key',{'keys':[{'type':'qcode','data':key}],'hold-time':10});time.sleep(.04)
+        offset=len(transcript)
+        execute('send-key',{'keys':[{'type':'qcode','data':'ctrl'},{'type':'qcode','data':'s'}],'hold-time':10});time.sleep(.04)
+        wait_for(b'\x1eORIGIN_READY\x1f',offset)
+        run('run demo.fo','2\r\n2\r\n2\r\nOrigin Script complete.')
+        checks.append('Native editor-authored multiline program executes variables and repeat loop in guest')
+        run('code train hello','Training actual guest Transformer')
+        run('stop','Guest training stopped.')
+        run('code prnit 2','Did you mean print?')
+        checks.append('Native Origin Script: exact arithmetic, RAM source execution, checked errors, typo suggestion without autoexecution')
         run('clear','Console cleared.')
-        run('about','Familiar Origin 0.1.1')
+        run('about','Familiar Origin 0.1.3')
         run('selftest','SELFTEST PASS')
         screenshot=str((evidence/'boot-screen.ppm').resolve())
         execute('screendump',{'filename':screenshot})
@@ -140,9 +199,9 @@ with tempfile.TemporaryDirectory(prefix='origin-vm-') as temp:
         offset=len(transcript);os.write(serial_in,b'halt\n');wait_for(b'CPU halted.',offset)
         checks.append('CPU halt')
         report={'status':'PASS','started_at_utc':utc,'finished_at_utc':iso(),
-                'guest_memory':args.memory,'boot_to_prompt_seconds':boot_seconds,'total_test_seconds':time.monotonic()-start,
+                'guest_memory':args.memory,'architecture':args.arch,'boot_to_prompt_seconds':boot_seconds,'total_test_seconds':time.monotonic()-start,
                 'qemu_version':subprocess.check_output([args.qemu,'--version'],text=True).splitlines()[0],
-                'image_sha256':hashlib.sha256(Path('build/origin.img').read_bytes()).hexdigest(),
+                'image_sha256':hashlib.sha256((build/'origin.img').read_bytes()).hexdigest(),
                 'checks':checks,'scope':'QEMU software-emulated x86 BIOS VM only; no physical hardware claims.'}
         (evidence/'boot-test.json').write_text(json.dumps(report,indent=2)+'\n')
         print(json.dumps(report,indent=2))

@@ -20,6 +20,7 @@ import path from 'node:path';
 
 const base = (process.env.FO_URL || 'http://127.0.0.1:8767/').replace(/\/?$/, '/');
 const report = process.env.FO_REPORT || 'evidence/browser-qa.json';
+const version = fs.readFileSync('VERSION', 'utf8').trim();
 const browser = process.env.FO_BROWSER || [
   'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
   'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
@@ -130,12 +131,15 @@ async function main() {
   // ---- the VM page -------------------------------------------------------------------
   await open('');
   await until("typeof V86==='function'&&typeof OriginCommands==='object'", 'page scripts');
-  pass('Page shows version 0.1.1', (await js("document.querySelector('.brand span').textContent")) === '0.1.1');
-  pass('Command table lists all 16 rows before the VM starts', (await js("document.querySelectorAll('.command-table tbody tr').length")) === 16);
+  pass('Page shows version ' + version, (await js("document.querySelector('.brand span').textContent")) === version);
+  const rows = await js("document.querySelectorAll('.command-table tbody tr').length");
+  pass('Command table is visible before the VM starts (' + rows + ' rows)', rows >= 20);
+  const unlisted = await js("(()=>{const t=document.querySelector('.command-table').textContent;return Object.keys(OriginCommands.descriptions).filter(c=>!t.includes(c));})()");
+  pass('Command table names every command the page accepts', unlisted.length === 0);
   await click('start');
   await until(ready, 'kernel ready after Start VM', 120000);
   const boot = await text('terminal');
-  pass('v86 boots the image to the kernel prompt', boot.includes('FAMILIAR ORIGIN 0.1.1'));
+  pass('v86 boots the image to the kernel prompt', boot.includes('FAMILIAR ORIGIN ' + version));
   pass('Kernel boot self-test passes', boot.includes('BOOT SELFTEST PASS'));
   pass('Native framebuffer canvas is displayed', await js("(()=>{const c=document.querySelector('#screen canvas');return !!c&&getComputedStyle(c).display!=='none'&&c.width>0;})()"));
 
@@ -168,6 +172,15 @@ async function main() {
   await click('confirm-action');
   await until("!document.getElementById('file-list').textContent.includes('file1.txt')", 'file removal');
   pass('Confirm removes the file and refreshes the listing');
+
+  // The Transformer trains inside the guest: the page only sends the command and reads the serial output.
+  await run('hello');
+  await until(terminalHas('Training actual guest Transformer'), 'guest training to start', 30000);
+  await until(terminalHas('NN step 250') + '&&' + terminalHas('predicted [Hello, world!]'), 'guest training to finish', 420000);
+  pass('Guest Transformer trains for 250 steps and predicts "Hello, world!"');
+  await run('code print 2+3*4');
+  await until("/code print 2\\+3\\*4\\s+14\\s+Origin Script complete\\./.test(document.getElementById('terminal').textContent)", 'Origin Script result', 30000);
+  pass('Origin Script statement "code print 2+3*4" prints 14 in the guest');
 
   await click('pause');
   await until("document.getElementById('status').textContent.startsWith('Paused')", 'pause');
@@ -224,9 +237,10 @@ await sleep(500);
 try { fs.rmSync(profile, { recursive: true, force: true }); } catch { /* the profile is in the temp folder */ }
 
 let image = '';
-try { image = crypto.createHash('sha256').update(Buffer.from(await (await fetch(base + 'assets/origin.img')).arrayBuffer())).digest('hex'); } catch { image = 'unavailable'; }
+// The same address the page boots from (app.js adds the version, so a cache cannot serve an older image).
+try { image = crypto.createHash('sha256').update(Buffer.from(await (await fetch(base + 'assets/origin.img?v=' + version)).arrayBuffer())).digest('hex'); } catch { image = 'unavailable'; }
 const result = {
-  status: failure ? 'FAIL' : 'PASS', version: '0.1.1', tested_at_utc: new Date().toISOString(), url: base,
+  status: failure ? 'FAIL' : 'PASS', version, tested_at_utc: new Date().toISOString(), url: base,
   browser: product, user_agent: userAgent, mode: 'headless, throwaway profile', host: `${os.type()} ${os.release()} ${os.arch()}`,
   image_sha256: image, checks, failure,
   other_origin_requests: [...otherOrigins], same_host_requests_outside_site: sameHostOutsideSite, tls_issuer: tlsIssuer || 'not HTTPS',

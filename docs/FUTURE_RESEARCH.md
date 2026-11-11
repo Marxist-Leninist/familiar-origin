@@ -8,7 +8,7 @@ A future action registry should carry a stable action ID, typed arguments, side 
 
 ## Transformer-first assistance and continual training
 
-The shipped browser lab trains an actual 816-parameter causal Transformer from random weights to memorize one phrase. It is separate from the guest kernel. It has no OS task-training data, persistent background training, model promotion or command authority.
+The shipped guest now trains an actual 816-parameter causal Transformer from random weights to memorize one phrase in both 64-bit and 32-bit builds. The optional browser reference is separate. It has no OS task-training data, persistent background training, model promotion or command authority.
 
 Next experiment: generate synthetic natural-language/action pairs from the deterministic registry, hold out entire phrase templates and typo families, then train a small proposal model. Compare it with deterministic and statistical baselines for exact action/argument accuracy, calibration, abstention, latency and memory. Training loss alone is not a promotion criterion. A model must pass held-out intent tests, payload preservation, unknown-command rejection, destructive-action confirmation and all existing regressions before even shadow deployment. Require explicit choice before replacing suggestions. Keep a frozen known-good model and immediate rollback.
 
@@ -16,7 +16,7 @@ Continual mode should be opt-in, with inspectable local-only examples, exclusion
 
 ## Native performance and language experiments
 
-Current guest code is compiled native 32-bit x86 plus boot/input assembly. SIMD is disabled; CPUID display is not an AVX implementation. Before AVX use, verify CPUID XSAVE/OSXSAVE/AVX, configure OS state handling and check XGETBV XCR0 bits. AVX2/AVX-512 need their extra feature/state checks, context preservation and fallback tests. ARM NEON/SVE and RISC-V vector targets need their own detection and ABI handling. Do not run unknown instructions speculatively.
+Current guest code is native x86-64 by default, with a 32-bit compatibility build. SSE2 scalar math is enabled in the 64-bit target and x87 in the 32-bit target; no AVX backend is implemented. Before AVX use, verify CPUID XSAVE/OSXSAVE/AVX, configure OS state handling and check XGETBV XCR0 bits. AVX2/AVX-512 need their extra feature/state checks, context preservation and fallback tests. ARM NEON/SVE and RISC-V vector targets need their own detection and ABI handling. Do not run unknown instructions speculatively.
 
 Benchmark scalar, compiler-vectorized and selected explicit-vector kernels for correctness and end-to-end useful work, not just peak arithmetic. A possible new language should begin as an inspectable typed action/dataflow DSL, compile into existing safe interfaces, and earn its place against C/Rust/Python baselines. No new language or fastest-performance result is implemented.
 
@@ -46,10 +46,22 @@ Aim for safe defaults with clearly explained owner choices and recovery routes. 
 
 A future normal mode should combine ordinary CPU caching, RAM and persistent storage rather than pretending they are interchangeable. RAM-only operation is plausible after boot, with clear volatility and recovery choices. Storage-backed low-RAM operation still needs working memory for the kernel, page tables, DMA and I/O buffers; an SSD is not a direct substitute for physical RAM. Cache-as-RAM is specialized firmware/hardware behavior, not an assumed general-purpose CPU mode.
 
-The current kernel has a fixed RAM arena, no paging, swap, persistent block driver or cache-management policy. Future benchmarks must use matched hardware and workloads, include tail input latency, task completion, throughput, memory pressure, energy, bytes written and write amplification, and compare well-configured Windows/Linux baselines. SSD wear depends on the actual device and workload. No paging superiority has been demonstrated.
+The current kernel has a fixed RAM arena and no demand paging or virtual-memory management (the 64-bit build has only a static identity map), swap, persistent block driver or cache-management policy. Future benchmarks must use matched hardware and workloads, include tail input latency, task completion, throughput, memory pressure, energy, bytes written and write amplification, and compare well-configured Windows/Linux baselines. SSD wear depends on the actual device and workload. No paging superiority has been demonstrated.
 
 ## Fault injection and recovery
 
 There is currently no exception handler, crash recovery or radiation tolerance. A future isolated test harness should inject reproducible register, memory and instruction-stream bit faults in disposable VM snapshots, then report crashes, silent corruption, detected/recovered failures and data loss against an unprotected baseline. Add checksummed state, bounded validation, journal/checkpoint recovery and watchdogs one at a time. AI diagnosis should summarize verified logs, never invent a repair or overwrite evidence.
 
 Representative terrestrial and space fault rates require published sources and actual device/orbit/environment assumptions; arbitrary flips are stress tests, not radiation qualification. Software does not replace radiation-hardened components, ECC, shielding, redundancy or mission-specific certification. No actual user hardware is deliberately damaged, corrupted or exposed to radiation.
+
+## Python and constrained-device exploration
+
+Python is not implemented. An actual appropriately licensed MicroPython port is a possible bounded next step, with tested bytecode execution, GC, exception handling and explicit module limits. A custom expression parser must not be presented as Python. Even a MicroPython port would not imply CPython package, NumPy, PyTorch or CUDA compatibility.
+
+Classic Game Boy, Nintendo DS and older phones have different CPUs, memory budgets and boot chains. They need separate narrowly scoped ports or remote-client designs, not a claim that the current x86 binary or Transformer fits all devices. No unlocking, flashing or security change is part of this release.
+
+A remotely controlled QEMU display/input bridge would be a proxy to an emulator, not a guest-native MCP server. Existing disposable QMP tests already demonstrate screenshots and synthetic input; no remote listener, persistent credential or deployment has been created.
+
+## Unchanged AGILLM trainer compatibility
+
+Running an arbitrary existing single-file trainer unchanged requires its actual Python version, native extensions, framework ABI, filesystem/memory behavior and accelerator dependencies. PyTorch/CUDA cannot run merely because a small Python interpreter exists. No live AGILLM trainer was inspected or modified for this kernel release, and no weights/checkpoints were transferred. The compatibility audit must begin with a user-authorized source/dependency inventory and isolated unchanged-script tests on a genuinely supported runtime. It remains unimplemented here.

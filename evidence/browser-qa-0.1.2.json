@@ -1,0 +1,17 @@
+{
+  "version": "0.1.2",
+  "status": "PASS for stated checks",
+  "scope": "Cloud Chromium; not Edge/laptop verification",
+  "checks": [
+    "Boots actual 32-bit compatibility image",
+    "Native/compatibility architecture labels visible",
+    "Train guest NN button dispatches hello into guest",
+    "Guest emits 26 reports from step 0 to step 250",
+    "Loss 2.485573 to 0.000076",
+    "Weight fingerprint 567631401 to 3770981898",
+    "Generated output wHr^o to Hello, world!",
+    "Guest training completion observed"
+  ],
+  "native_editor_and_mouse": "Tested through real QEMU PS/2 input on both architectures; not separately retested through browser capture",
+  "notes": "Browser reference worker was not opened or used for this guest training test."
+}

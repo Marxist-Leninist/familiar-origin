@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "execution": "Actual 64-bit guest kernel, SSE2 scalar floating point, no host inference",
+  "steps": 250,
+  "parameters": 816,
+  "initial": [
+    "0",
+    "2.485573",
+    "567631401",
+    "wHr^o"
+  ],
+  "final": [
+    "250",
+    "0.000076",
+    "3821224265",
+    "Hello, world!"
+  ],
+  "qemu_observed_seconds": 0.3745933799946215,
+  "scope": "Single-phrase memorization; not general language understanding"
+}

@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "version": "0.1.3",
+  "checked_at_utc": "2026-11-11T10:52:30Z",
+  "machine": "A second x86-64 Linux machine, not the one that built the release images",
+  "qemu_version": "QEMU emulator version 8.2.2 (Debian 1:8.2.2+ds-0ubuntu1.18)",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0; GNU ld (GNU Binutils for Ubuntu) 2.42",
+  "release_images": {
+    "64": {
+      "image_sha256": "719b83b378649c28929a817597d2453352957f1282a0666ff751602acc286789",
+      "status": "PASS",
+      "checks": 81,
+      "boot_to_prompt_seconds": 0.99,
+      "total_test_seconds": 12.4,
+      "guest_training": {
+        "steps": 250,
+        "final_loss": "0.000076",
+        "output": "Hello, world!",
+        "qemu_observed_seconds": 1.186
+      }
+    },
+    "32": {
+      "image_sha256": "b49549d9a7a372313ab27dd2f72581bb569783f5c5b35e002205e17d57a29907",
+      "status": "PASS",
+      "checks": 81,
+      "boot_to_prompt_seconds": 0.381,
+      "total_test_seconds": 23.0,
+      "guest_training": {
+        "steps": 250,
+        "final_loss": "0.000076",
+        "output": "Hello, world!",
+        "qemu_observed_seconds": 7.732
+      }
+    }
+  },
+  "rebuilt_from_source_here": {
+    "64": {
+      "image_sha256": "726512a5410c508370ae45db0fcec14eb4a6aa847e2a30ef572aad688e75f07d",
+      "status": "PASS",
+      "checks": 81,
+      "boot_to_prompt_seconds": 0.403,
+      "total_test_seconds": 11.6
+    },
+    "32": {
+      "image_sha256": "5aa2301bc65c045537a8aac538a033f03c76bcdfe2e0e3988c5d84915473d82a",
+      "status": "PASS",
+      "checks": 81,
+      "boot_to_prompt_seconds": 0.431,
+      "total_test_seconds": 22.8
+    },
+    "note": "Built on this machine from the same source. The bytes differ from the release images because the compiler version differs; both pass the same suite."
+  },
+  "host_tests": {
+    "test_core": "PASS",
+    "test_nn": "PASS",
+    "test_gui": "PASS",
+    "test_lang": "PASS",
+    "test_image build64": "PASS",
+    "test_image build32": "PASS"
+  },
+  "node_tests": {
+    "node": "v22.22.0",
+    "test_commands.cjs": "PASS",
+    "test_transformer.cjs": "PASS",
+    "test_v86.mjs": "PASS"
+  },
+  "scope": "Emulated runs only. Not a hardware, performance or security test, and the timings are not benchmarks.",
+  "produced_by": "tests/test_boot.py for each architecture, the host test targets, tests/test_image.py and the node tests, run by hand"
+}

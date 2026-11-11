@@ -20,3 +20,7 @@ assert.equal(C.resolve('removee Mixed.TXT').kind,'unsupported');
 assert.equal(C.resolve('makee file').kind,'unsupported');
 assert.equal(C.resolve('save delte this in note.txt').command,'write note.txt delte this');
 console.log('PASS: 26 command/alias/typo/payload/suggestion/filename safety assertions.');
+
+assert.equal(C.resolve('train hello world').command,'hello');assert.equal(C.resolve('i').command,'hello');assert.equal(C.resolve('stop training').command,'stop');assert.equal(C.resolve('g').command,'generate');assert.equal(C.resolve('o Mixed.txt').command,'edit Mixed.txt');assert.equal(C.resolve('run hello').command,'run hello');console.log('PASS: 6 guest training/editor command checks.');
+
+assert.equal(C.resolve('run Demo.fo').command,'run Demo.fo');assert.equal(C.resolve('code print 2+3').command,'code print 2+3');console.log('PASS: Origin Script bridge keeps program name and source intact.');

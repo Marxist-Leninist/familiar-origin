@@ -1,2 +1,3 @@
-PASS same-toolchain full rebuild:
-03e8bc6eec25bd6d5049dada37c28cef02cae58a282c79805f33a7c80ec75281  build/origin.img
+PASS same-toolchain full rebuild, both architectures:
+b49549d9a7a372313ab27dd2f72581bb569783f5c5b35e002205e17d57a29907  build32/origin.img
+719b83b378649c28929a817597d2453352957f1282a0666ff751602acc286789  build64/origin.img
