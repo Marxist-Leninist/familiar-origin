@@ -55,7 +55,7 @@ def server_state():
         socket.create_connection(('127.0.0.1', PORT), timeout=0.5).close()
     except OSError:
         return 'down'
-    for patience in (2, 6):  # a second, longer try: our own server can be slow on a busy laptop
+    for patience in (2, 6):  # a second, longer try: our own server can be slow on a busy computer
         try:
             with LOCAL.open(URL, timeout=patience) as reply:
                 if (reply.headers.get('Server') or '').startswith('FamiliarOriginLocal'):
@@ -140,7 +140,7 @@ def main():
         except OSError:
             offset = 0
         server = start_server()
-        deadline = time.monotonic() + 20  # a busy laptop can be slow to start Python
+        deadline = time.monotonic() + 20  # a busy computer can be slow to start Python
         while time.monotonic() < deadline:
             time.sleep(0.25)
             exited = server.poll() is not None  # serve.py gave up (files missing, port taken)

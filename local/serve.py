@@ -61,7 +61,7 @@ HOST_OK = re.compile(r'(?:127\.0\.0\.1|localhost)(?::[0-9]{1,5})?', re.IGNORECAS
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = 'FamiliarOriginLocal/1.3.2'
+    server_version = 'FamiliarOriginLocal/1.3.3'
     sys_version = ''
     protocol_version = 'HTTP/1.1'
     timeout = 30  # release idle keep-alive connections
@@ -82,12 +82,20 @@ class Handler(BaseHTTPRequestHandler):
         # Lets stop_local.pyw stop exactly the process that is answering on this port.
         self.send_header('X-Familiar-Origin-Pid', str(os.getpid()))
 
-    def refuse(self, code, text):
+    def refuse(self, code, text, identify=True):
+        """A short plain-text error. With identify=False the reply names neither this
+        server nor its process; that is what a request under a foreign host name gets."""
         body = (text + '\n').encode()
-        self.send_response(code)
+        if identify:
+            self.send_response(code)
+        else:
+            self.send_response_only(code)
         self.send_header('Content-Type', 'text/plain; charset=utf-8')
         self.send_header('Content-Length', str(len(body)))
-        self.common_headers()
+        if identify:
+            self.common_headers()
+        else:
+            self.send_header('X-Content-Type-Options', 'nosniff')
         self.end_headers()
         if self.command != 'HEAD':
             self.wfile.write(body)
@@ -115,7 +123,7 @@ class Handler(BaseHTTPRequestHandler):
         hosts = self.headers.get_all('Host') or []
         # Only the blank and tab that HTTP allows around a header value are ignored.
         if len(hosts) != 1 or not HOST_OK.fullmatch(hosts[0].strip(' \t')):
-            self.refuse(403, 'This server answers only on this computer.')
+            self.refuse(403, 'This server answers only on this computer.', identify=False)
             return
         target = self.wanted_file()
         try:

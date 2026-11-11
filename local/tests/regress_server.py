@@ -90,8 +90,13 @@ for _ in range(50):
     s.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('hh' if os.name == 'nt' else 'ii', 1, 0))
     s.close()
 time.sleep(2)
-grew = log_size() - before
-check('server.log did not grow from junk or dropped requests', grew <= 200, '%d bytes added' % grew)
+if os.path.exists(LOG):
+    grew = log_size() - before
+    check('server.log did not grow from junk or dropped requests', grew <= 200, '%d bytes added' % grew)
+else:
+    # Without a log file this check would pass without testing anything.
+    print('SKIP server.log growth check: %s does not exist. The server writes it only when it is started by '
+          'open_local.pyw or with its output redirected there.' % LOG)
 check('server still answers normally afterwards', request(b'GET / HTTP/1.1').startswith(b'HTTP/1.1 200'))
 
 print('%d/%d regression probes passed' % (sum(results), len(results)))

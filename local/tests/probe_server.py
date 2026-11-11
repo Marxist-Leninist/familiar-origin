@@ -111,8 +111,19 @@ for name, must in [('Content-Type', 'application/wasm'), ('Content-Security-Poli
     results.append(ok)
     print('%-4s header %-34s %s' % ('PASS' if ok else 'FAIL', name, line[:110]))
 
+# A request under a foreign host name gets a bare 403: nothing in it names this server or its process.
+bare = get('/', 'evil.example').decode('latin-1').partition('\r\n\r\n')[0].lower()
+for name in ('server:', 'x-familiar-origin-pid:'):
+    ok = ('\r\n' + name) not in bare
+    results.append(ok)
+    print('%-4s refused foreign-host reply has no %s header' % ('PASS' if ok else 'FAIL', name.rstrip(':')))
+
 # The server must not be reachable from other machines: every non-loopback address must refuse.
-others = sorted({info[4][0] for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET)} - {'127.0.0.1'})
+try:
+    others = sorted({info[4][0] for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET)} - {'127.0.0.1'})
+except OSError as error:
+    others = []
+    print('SKIP other-address check: this computer\'s own name does not resolve (%s)' % error)
 for address in others:
     try:
         with socket.create_connection((address, PORT), timeout=2):

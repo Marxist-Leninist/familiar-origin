@@ -97,21 +97,28 @@ def port_in_use():
         return False
 
 
-def stop_python_process(pid):
-    """Terminate pid only when it is a Python process. True when it has exited."""
+def stop_server_process(pid):
+    """Terminate pid when it is a Python process that holds the listening socket.
+
+    Returns 'stopped', 'not-listener' or 'failed'. The process is opened first: while the
+    handle is open Windows cannot give this PID to a different process, so the checks and
+    the termination are certain to be about the same process.
+    """
     handle = kernel32.OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, False, pid)
     if not handle:
-        return False
+        return 'not-listener' if listener_pid() != pid else 'failed'
     try:
+        if listener_pid() != pid:
+            return 'not-listener'
         size = wintypes.DWORD(1024)
         image = ctypes.create_unicode_buffer(size.value)
         if not kernel32.QueryFullProcessImageNameW(handle, 0, image, ctypes.byref(size)):
-            return False
+            return 'failed'
         if not Path(image.value).name.lower().startswith('python'):
-            return False
+            return 'failed'
         if not kernel32.TerminateProcess(handle, 0):
-            return False
-        return kernel32.WaitForSingleObject(handle, 5000) == 0
+            return 'failed'
+        return 'stopped' if kernel32.WaitForSingleObject(handle, 5000) == 0 else 'failed'
     finally:
         kernel32.CloseHandle(handle)
 
@@ -141,11 +148,12 @@ def main():
         remove_pid_file()  # nothing holds the port, so a leftover file names a dead process
         message('The local Familiar Origin server is not running.')
         return 0
-    if listener_pid() != pid:
+    outcome = stop_server_process(pid)
+    if outcome == 'not-listener':
         message('Port %d answers as Familiar Origin, but process %d does not hold that port, so '
                 'nothing was stopped.' % (PORT, pid), 0x30)
         return 2
-    if not stop_python_process(pid):
+    if outcome != 'stopped':
         message('Could not stop the local Familiar Origin server (process %d).' % pid, 0x30)
         return 1
     for _ in range(20):
