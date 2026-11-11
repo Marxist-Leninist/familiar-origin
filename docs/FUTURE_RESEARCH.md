@@ -62,6 +62,6 @@ Classic Game Boy, Nintendo DS and older phones have different CPUs, memory budge
 
 A remotely controlled QEMU display/input bridge would be a proxy to an emulator, not a guest-native MCP server. Existing disposable QMP tests already demonstrate screenshots and synthetic input; no remote listener, persistent credential or deployment has been created.
 
-## Unchanged AGILLM trainer compatibility
+## Running existing Python trainers unchanged
 
-Running an arbitrary existing single-file trainer unchanged requires its actual Python version, native extensions, framework ABI, filesystem/memory behavior and accelerator dependencies. PyTorch/CUDA cannot run merely because a small Python interpreter exists. No live AGILLM trainer was inspected or modified for this kernel release, and no weights/checkpoints were transferred. The compatibility audit must begin with a user-authorized source/dependency inventory and isolated unchanged-script tests on a genuinely supported runtime. It remains unimplemented here.
+Running an arbitrary existing single-file trainer unchanged requires its actual Python version, native extensions, framework ABI, filesystem/memory behavior and accelerator dependencies. PyTorch/CUDA cannot run merely because a small Python interpreter exists. A compatibility study would start with a source/dependency inventory of the target script and isolated unchanged-script tests on a genuinely supported runtime. It remains unimplemented here.

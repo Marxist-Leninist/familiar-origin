@@ -11,6 +11,7 @@ Rules:
 2. `tools/publish_both.sh` pushes that commit and its tag to both repositories and fails unless both end on the same commit.
 3. `tools/check_sync.sh` compares the two repositories at any time. It prints both heads and exits non-zero if the branch or any tag differs.
 4. Nothing is pushed to the private mirror on its own. If the two ever differ, the public repository wins: fast-forward the mirror from it.
+5. Corrections to documents and tests may be committed to `main` between releases without a tag. They are pushed to both repositories in the same step. The website and the release bundle still come from the latest tagged commit, so nothing under `browser-site/dist` or `src` and neither disk image changes outside a release. `MANIFEST.sha256` is updated for the corrected files, so it keeps matching the committed tree; the bundle attached to the last release keeps its own copy.
 
 Both scripts read the two remote URLs from the `FO_PUBLIC` and `FO_PRIVATE` environment variables, or from git remotes named `public` and `private`.
 

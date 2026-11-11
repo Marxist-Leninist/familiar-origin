@@ -1,6 +1,6 @@
 # Origin Script v0
 
-A real, small interpreter executing inside Familiar Origin. It is not Python and does not run existing Python or AGILLM files. The language currently favors readable statements, exact integer semantics and bounded execution. It is not a performance claim or a neural parser.
+A real, small interpreter executing inside Familiar Origin. It is not Python and does not run existing Python files. The language currently favors readable statements, exact integer semantics and bounded execution. It is not a performance claim or a neural parser.
 
 ## Try a single line
 
@@ -33,6 +33,8 @@ Save with Ctrl+S, then select the file and click Run .fo, or enter `run demo.fo`
 - `train hello` starts the real guest Transformer; `stop training` stops it; `generate hello` asks it to generate from current weights. Training is cooperative/asynchronous: these statements start/stop/request, they do not wait for convergence. A subsequent generate in the same script may still use untrained weights.
 
 Each invocation has fresh variables. Limits: 511 source bytes, 64 lines, eight variables with names up to 15 characters, expression depth eight, loop depth four and at most 1,000 executed statements. There is no file/network/system API, third-party package loader, arbitrary machine-code execution, imports, functions, persistent state or general Python compatibility.
+
+Known limit in 0.1.3: a program of exactly 64 lines must not end with a newline. The empty line after the last newline is counted as a 65th line and the program is refused.
 
 ## Human mistakes and exact actions
 

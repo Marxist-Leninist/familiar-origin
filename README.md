@@ -84,6 +84,15 @@ This is not a daily-use OS or a security sandbox. It runs in ring 0, without pro
 
 Native Edge, Claude, Codex, ARM64/Android/Apple hardware, modern UEFI, continual neural task learning, robust fault recovery and other platforms remain future work. No host security settings, device firmware or boot partitions were changed. See [architecture](docs/ARCHITECTURE.md), [accessibility](docs/ACCESSIBILITY.md), [roadmap](docs/ROADMAP.md) and [research goals](docs/FUTURE_RESEARCH.md).
 
+### Known issues in 0.1.3
+
+A review after the release found these. The first two are in the browser page and will be fixed with the next tagged release; the last two are in the kernel and need a new disk image.
+
+- In the browser command field, `run s`, `run g` and `run o` are passed to the guest as `run stop`, `run generate` and `run edit`, which the kernel refuses. Use `s`, `g` and `o NAME` instead.
+- The browser page asks before `write` replaces a file only when that file is in its own file list. After creating or saving a file in the native desktop, press the page's **Refresh** button before using `write` on it.
+- Native editor: text that begins with spaces is saved without those spaces, and the editor then keeps treating the text as unsaved. Leave with Escape and choose Discard; the file holds the text without the leading spaces.
+- Origin Script: a program of exactly 64 lines must not end with a newline, because the empty line after it is counted as a 65th line.
+
 ## Original code and licensing
 
 The boot loader, kernel, GUI, editor, tiny neural implementation, Origin Script interpreter and tests were written for this project. Existing GCC/binutils, QEMU, SeaBIOS and v86 are not claimed as inventions. No open-source license has been selected for the project's original code; public availability alone does not grant one.
