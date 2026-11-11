@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "scope": "Browser/Node CPU research demo, not guest kernel execution or general intelligence. One training phrase memorized, not held-out language ability.",
+  "results": [
+    {
+      "seed": 7,
+      "steps": 250,
+      "initial_loss": 2.4855735828839762,
+      "final_loss": 0.00007690797940337493,
+      "before": "wHr^o",
+      "after": "Hello, world!",
+      "milliseconds": 50.873352000000004,
+      "parameters": 816
+    },
+    {
+      "seed": 42,
+      "steps": 250,
+      "initial_loss": 2.48554627920272,
+      "final_loss": 0.000039715424436386524,
+      "before": "w^Hr!ow!owHrH!",
+      "after": "Hello, world!",
+      "milliseconds": 38.99419200000001,
+      "parameters": 816
+    },
+    {
+      "seed": 123,
+      "steps": 250,
+      "initial_loss": 2.4846151427362586,
+      "final_loss": 0.000019251673968513827,
+      "before": "   !l!!l!ll!!,",
+      "after": "Hello, world!",
+      "milliseconds": 38.11544900000001,
+      "parameters": 816
+    }
+  ],
+  "gradient_samples": 18,
+  "maximum_gradient_absolute_error": 3.685508842554697e-11
+}

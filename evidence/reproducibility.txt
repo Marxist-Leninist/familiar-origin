@@ -1,0 +1,2 @@
+PASS same-toolchain full rebuild:
+03e8bc6eec25bd6d5049dada37c28cef02cae58a282c79805f33a7c80ec75281  build/origin.img

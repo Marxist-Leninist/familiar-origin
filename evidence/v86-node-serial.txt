@@ -1,0 +1,14 @@
+FAMILIAR ORIGIN 0.1.1
+Original BIOS loader + freestanding C kernel
+BOOT SELFTEST PASS
+No login required in this single-user VM prototype.
+Commands: h help | l files | r read | w write | d delete | m memory
+More: a about | c CPU | t tests | n new file | b allocate | e echo | x clear | q halt
+Your files live only in RAM.
+origin> ORIGIN_READYselftest
+SELFTEST PASS: allocator, RAM files, tokenizer
+origin> ORIGIN_READYwrite test hello-browser
+Saved to RAM only.
+origin> ORIGIN_READYcat test
+hello-browser
+origin> 

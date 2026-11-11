@@ -1,0 +1,9 @@
+build/
+.tools/
+__pycache__/
+*.pyc
+browser-site/.git/
+browser-site/.openai/
+evidence/*.ppm
+evidence/browser-vm.jpg
+core-payload.tar.gz

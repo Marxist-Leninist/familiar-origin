@@ -1,0 +1,145 @@
+FAMILIAR ORIGIN 0.1.1
+Original BIOS loader + freestanding C kernel
+BOOT SELFTEST PASS
+No login required in this single-user VM prototype.
+Commands: h help | l files | r read | w write | d delete | m memory
+More: a about | c CPU | t tests | n new file | b allocate | e echo | x clear | q halt
+Your files live only in RAM.
+origin> ORIGIN_READYhelp
+help about cpu mem alloc selftest ls cat write new rm echo clear halt run
+Shortcuts: h help, a about, c cpu, m mem, t selftest, l ls, r cat
+w write, n new (no overwrite), d rm, b alloc, e echo, x clear, q halt
+Use: w NAME TEXT | r NAME | d NAME | b BYTES
+Files are RAM-only: all changes disappear on reboot.
+origin> ORIGIN_READYh
+help about cpu mem alloc selftest ls cat write new rm echo clear halt run
+Shortcuts: h help, a about, c cpu, m mem, t selftest, l ls, r cat
+w write, n new (no overwrite), d rm, b alloc, e echo, x clear, q halt
+Use: w NAME TEXT | r NAME | d NAME | b BYTES
+Files are RAM-only: all changes disappear on reboot.
+origin> ORIGIN_READYshow files
+welcome.txt  49 bytes
+roadmap.txt  137 bytes
+origin> ORIGIN_READYn unique.txt first
+Saved to RAM only.
+origin> ORIGIN_READYn unique.txt second
+File exists; not overwritten.
+origin> ORIGIN_READYr unique.txt
+first
+origin> ORIGIN_READYdelete unique.txt
+Delete RAM file unique.txt? Type yes or no.
+origin> ORIGIN_READYno
+Deletion cancelled.
+origin> ORIGIN_READYr unique.txt
+first
+origin> ORIGIN_READYd unique.txt
+Delete RAM file unique.txt? Type yes or no.
+origin> ORIGIN_READYyes
+Removed from RAM.
+origin> ORIGIN_READYrun selftest
+Running built-in utility: selftest
+SELFTEST PASS: allocator, RAM files, tokenizer
+origin> ORIGIN_READYrun edge.exe
+External executable not supported. Built-ins: help about cpu mem selftest ls cat
+origin> ORIGIN_READYabout
+Familiar Origin 0.1.1: original research kernel, no Linux kernel.
+BIOS x86 VM prototype. No network, browser, app ABI or process isolation.
+Single-user console; no password is requested or stored.
+Not safe for sensitive data or use as your daily operating system.
+origin> ORIGIN_READYcpu
+CPU vendor: GenuineIntel; 32-bit protected mode
+origin> ORIGIN_READYmem
+Dedicated kernel arena: 65536 bytes; used: 0
+RAM files: 8 slots, 511 bytes per file. This is not detected system RAM.
+origin> ORIGIN_READYalloc 0
+Allocation rejected: zero size or arena full.
+origin> ORIGIN_READYalloc -1
+Usage: alloc BYTES (positive decimal integer).
+origin> ORIGIN_READYalloc 4294967296
+Usage: alloc BYTES (positive decimal integer).
+origin> ORIGIN_READYalloc 1
+Allocated 1 bytes. No free operation in this prototype.
+origin> ORIGIN_READYalloc 16
+Allocated 16 bytes. No free operation in this prototype.
+origin> ORIGIN_READYmem
+Dedicated kernel arena: 65536 bytes; used: 32
+RAM files: 8 slots, 511 bytes per file. This is not detected system RAM.
+origin> ORIGIN_READYalloc 65505
+Allocation rejected: zero size or arena full.
+origin> ORIGIN_READYalloc 65504
+Allocated 65504 bytes. No free operation in this prototype.
+origin> ORIGIN_READYalloc 1
+Allocation rejected: zero size or arena full.
+origin> ORIGIN_READYselftest
+SELFTEST PASS: allocator, RAM files, tokenizer
+origin> ORIGIN_READYls
+welcome.txt  49 bytes
+roadmap.txt  137 bytes
+origin> ORIGIN_READYcat welcome.txt
+Your own kernel is running. Type help to explore.
+origin> ORIGIN_READYwrite note.txt Hello from the original kernel
+Saved to RAM only.
+origin> ORIGIN_READYcat note.txt
+Hello from the original kernel
+origin> ORIGIN_READYwrite note.txt replacement
+Saved to RAM only.
+origin> ORIGIN_READYcat note.txt
+replacement
+origin> ORIGIN_READYrm note.txt
+Delete RAM file note.txt? Type yes or no.
+origin> ORIGIN_READYyes
+Removed from RAM.
+origin> ORIGIN_READYcat note.txt
+File not found.
+origin> ORIGIN_READYwrite bad/name reject
+Invalid name or content too long.
+origin> ORIGIN_READYwrite huge xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Invalid name or content too long.
+origin> ORIGIN_READYecho xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Input too long; command discarded.
+origin> ORIGIN_READYecho recovered
+recovered
+origin> ORIGIN_READYnot_a_command
+Unknown command. Type help.
+origin> ORIGIN_READYwrite f0 test
+Saved to RAM only.
+origin> ORIGIN_READYwrite f1 test
+Saved to RAM only.
+origin> ORIGIN_READYwrite f2 test
+Saved to RAM only.
+origin> ORIGIN_READYwrite f3 test
+Saved to RAM only.
+origin> ORIGIN_READYwrite f4 test
+Saved to RAM only.
+origin> ORIGIN_READYwrite f5 test
+Saved to RAM only.
+origin> ORIGIN_READYwrite overflow test
+RAM filesystem full.
+origin> ORIGIN_READYwrite f0 updated
+Saved to RAM only.
+origin> ORIGIN_READYrm f0
+Delete RAM file f0? Type yes or no.
+origin> ORIGIN_READYyes
+Removed from RAM.
+origin> ORIGIN_READYwrite recycled test
+Saved to RAM only.
+origin> ORIGIN_READYecho key
+key
+origin> ORIGIN_READYrm f1
+Delete RAM file f1? Type yes or no.
+origin> ORIGIN_READYyes
+Removed from RAM.
+origin> ORIGIN_READYSaved to RAM only.
+origin> ORIGIN_READYcat file1.txt
+gui
+origin> ORIGIN_READYclear
+Console cleared.
+origin> ORIGIN_READYabout
+Familiar Origin 0.1.1: original research kernel, no Linux kernel.
+BIOS x86 VM prototype. No network, browser, app ABI or process isolation.
+Single-user console; no password is requested or stored.
+Not safe for sensitive data or use as your daily operating system.
+origin> ORIGIN_READYselftest
+SELFTEST PASS: allocator, RAM files, tokenizer
+origin> ORIGIN_READYhalt
+CPU halted. Close the

@@ -1,0 +1,78 @@
+{
+  "vendor/GPL-3.txt": {
+    "bytes": 35149,
+    "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+  },
+  "vendor/LGPL-2.txt": {
+    "bytes": 25381,
+    "sha256": "681e386e44a19d7d0674b4320272c90e66b6610b741e7e6305f8219c42e85366"
+  },
+  "vendor/LGPL-3.txt": {
+    "bytes": 7652,
+    "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
+  },
+  "vendor/RUST-NOTICE.txt": {
+    "bytes": 1609,
+    "sha256": "9ea11f99a48219b99cc4bd934dcfd10dba205835ba18a516713dce77e6fafabb"
+  },
+  "vendor/SEABIOS-NOTICE.txt": {
+    "bytes": 3349,
+    "sha256": "58b417317de591441140835ec61a35518441e465e2149aa8580a46e2ac6c18a7"
+  },
+  "vendor/SOFTFLOAT-NOTICE.txt": {
+    "bytes": 28217,
+    "sha256": "dabd5a4ac491cbbafafd3f79c5b0c07146c0f983d46707998c0cbe43c27ab87c"
+  },
+  "vendor/V86-LICENSE.txt": {
+    "bytes": 1306,
+    "sha256": "3f61ba65e3215b09ef264ba8d777d73c19644309fbb705967634eb5147e500a0"
+  },
+  "vendor/V86-MIT-NOTICE.txt": {
+    "bytes": 1141,
+    "sha256": "be2a564f95c110b381fde87ea17b24adb50a5cd4c279ecb7991dee7821041069"
+  },
+  "vendor/ZSTD-LICENSE.txt": {
+    "bytes": 1549,
+    "sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8"
+  },
+  "vendor/ZSTD-NOTICE.txt": {
+    "bytes": 389,
+    "sha256": "919731591493c8869bf2e41eeca1d2d9a9817bbdf947c60b368dce201ef1ef11"
+  },
+  "vendor/libv86.js": {
+    "bytes": 359857,
+    "sha256": "e257912c4a1129e36a86c1e2df69904ab969d87bffd24aa6676e84d6ddffc1c6"
+  },
+  "vendor/libv86.mjs": {
+    "bytes": 359819,
+    "sha256": "f9f3b4cae7dafb882e10e51aae9137ec52d5aed5ffbc9026f9081c73bbaae4c8"
+  },
+  "vendor/seabios-debian.tar.xz": {
+    "bytes": 8908,
+    "sha256": "237583c39828f9f5f7bb6f40ba2321f632911ea9891ddc79f54d5e4f0c7b726d"
+  },
+  "vendor/seabios-source.tar.gz": {
+    "bytes": 637076,
+    "sha256": "374dd8f6938e1673b084de4b2964514f7f9fd1b60eca1c12066c484d26286272"
+  },
+  "vendor/seabios.bin": {
+    "bytes": 262144,
+    "sha256": "fc6d2ea888862e6b26d53fb877ab712324726eb8f44eb6baf076c64a31f1c3fb"
+  },
+  "vendor/v86-fallback.wasm": {
+    "bytes": 2040034,
+    "sha256": "4eb64c9b7908d5931c1868eea4824b3a0a628eb86e6eac09d133776b50922d81"
+  },
+  "vendor/v86-source.tar.gz": {
+    "bytes": 1264386,
+    "sha256": "c06243a6598d1665df971c2b0f54fa4fa6a629f7fdac959f0a48dbca08f61d04"
+  },
+  "vendor/v86.wasm": {
+    "bytes": 2007347,
+    "sha256": "2f0c4150f266415b754a84a32e6f8e4c975a1d3abb94c78b047fa30027db1ef1"
+  },
+  "vendor/vgabios.bin": {
+    "bytes": 39424,
+    "sha256": "88277c3ebff60fe83696d99d44b7eee4426112ee1763c87347c30a5b75781932"
+  }
+}

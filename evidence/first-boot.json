@@ -1,0 +1,5 @@
+{
+  "observed_at_utc": "2026-11-11T06:36:54.944046+00:00",
+  "qemu_launch_to_prompt_seconds": 0.09870209399377927,
+  "proof": "Actual raw BIOS disk boot reached kernel shell and BOOT SELFTEST PASS."
+}

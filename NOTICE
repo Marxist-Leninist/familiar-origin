@@ -1,0 +1,25 @@
+Familiar Origin 0.1.1 is an original generated research prototype.
+
+The repository contains no intentionally copied third-party kernel source. It
+depends on standard external tools and emulated firmware for development/testing.
+GCC/binutils, Python and QEMU are separate third-party projects subject to their
+respective licenses. GCC and QEMU binaries are not included.
+
+The optional browser VM in browser-site/dist/vendor/ redistributes these
+unmodified third-party files:
+
+- v86 0.5.473 (commit 315b2b0): libv86.js, libv86.mjs, v86.wasm and
+  v86-fallback.wasm. BSD-2-Clause. They include QEMU-derived code under the MIT
+  license, Berkeley SoftFloat 3e, the Zstandard decompressor (used under its BSD
+  license) and the Rust standard library (MIT or Apache-2.0).
+- Debian seabios 1.16.3-2: seabios.bin (bios-256k.bin) and vgabios.bin
+  (vgabios-stdvga.bin). LGPL version 3, with one source file under LGPL version 2.
+
+Their license texts, notices and corresponding source archives are in the same
+folder and are listed on browser-site/dist/licenses.html.
+
+The owner has not selected an open-source license for this new repository.
+Public access alone is not an open-source license grant.
+
+No affiliation, certification or compatibility with Microsoft, Google, Anthropic
+or OpenAI is implied. Product names identify future compatibility goals.

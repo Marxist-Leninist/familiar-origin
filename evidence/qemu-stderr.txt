@@ -1,0 +1,2 @@
+rom: file kvmvapic.bin        : error Failed to open file “kvmvapic.bin”: No such file or directory
+qemu-system-i386: terminating on signal 15 from pid 17 (python3)

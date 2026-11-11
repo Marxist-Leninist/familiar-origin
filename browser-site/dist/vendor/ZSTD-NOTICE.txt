@@ -1,0 +1,8 @@
+Zstandard single-file decompressor (zstddeclib.c), compiled into v86's WebAssembly files.
+
+Copyright (c) 2016-2020, Yann Collet, Facebook, Inc.
+All rights reserved.
+
+Zstandard is offered under two licences, a BSD-style licence and GPLv2, and the
+recipient may choose either. It is used here under the BSD-style licence. The
+full text of that licence is in ZSTD-LICENSE.txt in this folder.

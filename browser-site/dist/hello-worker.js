@@ -1,0 +1,3 @@
+importScripts('tiny-transformer.js');
+let active=false,model=null;
+onmessage=event=>{if(event.data.type==='stop'){active=false;return;}if(event.data.type==='weights'){if(model)postMessage({type:'weights',value:model.checkpoint()});return;}if(event.data.type!=='train'||active)return;model=new HelloTransformer(7);active=true;const start=performance.now();postMessage({type:'progress',step:0,loss:model.loss(),output:model.generate()});function batch(){if(!active)return;let loss;for(let i=0;i<10&&model.step<250;i++)loss=model.train();postMessage({type:'progress',step:model.step,loss,output:model.generate()});if(model.step<250)setTimeout(batch,20);else{active=false;postMessage({type:'done',milliseconds:performance.now()-start});}}batch();};

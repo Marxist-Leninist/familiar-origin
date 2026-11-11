@@ -1,0 +1,82 @@
+gcc -m32 -std=c11 -Os -Wall -Wextra -Werror -ffreestanding -fno-builtin -fno-pie -fno-pic -fno-stack-protector -fno-asynchronous-unwind-tables -fno-unwind-tables -mno-sse -mno-mmx -msoft-float -c src/kernel.c -o build/kernel.o
+ld -m elf_i386 -nostdlib -T src/linker.ld -Map build/kernel.map build/entry.o build/kernel.o build/core.o build/gui.o -o build/kernel.elf
+objcopy -O binary build/kernel.elf build/kernel.bin
+python3 tools/mkimage.py
+Image: 1048576 bytes; boot: 512; kernel: 12308
+SHA256: 03e8bc6eec25bd6d5049dada37c28cef02cae58a282c79805f33a7c80ec75281
+ASAN_OPTIONS=${ASAN_OPTIONS:-detect_leaks=0} ./build/test_core
+HOST TEST PASS: core self-test, invalid names, bounds, full/reused RAMFS, allocation overflow
+python3 tests/test_image.py
+IMAGE TEST PASS: signature, size, kernel placement, no unresolved runtime symbols
+python3 tests/test_boot.py --qemu .tools/qemu-i386
+{
+  "status": "PASS",
+  "started_at_utc": "2026-11-11T07:34:11.070533+00:00",
+  "finished_at_utc": "2026-11-11T07:34:14.556344+00:00",
+  "guest_memory": "32M",
+  "boot_to_prompt_seconds": 0.09583393399952911,
+  "total_test_seconds": 3.4858344570020563,
+  "qemu_version": "QEMU emulator version 10.0.13 (Debian 1:10.0.13+ds-0+deb13u1)",
+  "image_sha256": "03e8bc6eec25bd6d5049dada37c28cef02cae58a282c79805f33a7c80ec75281",
+  "checks": [
+    "Raw BIOS boot to kernel prompt",
+    "help",
+    "h",
+    "show files",
+    "n unique.txt first",
+    "n unique.txt second",
+    "r unique.txt",
+    "delete unique.txt",
+    "no",
+    "r unique.txt",
+    "yes",
+    "run selftest",
+    "run edge.exe",
+    "about",
+    "cpu",
+    "mem",
+    "alloc 0",
+    "alloc -1",
+    "alloc 4294967296",
+    "alloc 1",
+    "alloc 16",
+    "mem",
+    "alloc 65505",
+    "alloc 65504",
+    "alloc 1",
+    "selftest",
+    "ls",
+    "cat welcome.txt",
+    "write note.txt Hello from the original kernel",
+    "cat note.txt",
+    "write note.txt replacement",
+    "cat note.txt",
+    "yes",
+    "cat note.txt",
+    "write bad/name reject",
+    "write huge xxxxxxxxxxxxxxxxxxxxx [oversize input]",
+    "echo xxxxxxxxxxxxxxxxxxxxxxxxxxx [oversize input]",
+    "echo recovered",
+    "not_a_command",
+    "write f0 test",
+    "write f1 test",
+    "write f2 test",
+    "write f3 test",
+    "write f4 test",
+    "write f5 test",
+    "write overflow test",
+    "write f0 updated",
+    "yes",
+    "write recycled test",
+    "PS/2 keyboard: echo key",
+    "yes",
+    "cat file1.txt",
+    "Native VGA GUI: mouse New File, keyboard text, create, serial readback",
+    "clear",
+    "about",
+    "selftest",
+    "VGA framebuffer screenshot saved",
+    "CPU halt"
+  ],
+  "scope": "QEMU software-emulated x86 BIOS VM only; no physical hardware claims."
+}
